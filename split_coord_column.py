@@ -1,18 +1,22 @@
-
 import arcpy
 
 """
-A script for splitting the station identifier text given by cliflo
-as a single text column with the latitude and longitude, into two
-new latitude and longitude columns of type float. It then creates
-a point feature class based on the new table.
+A script for splitting the station identifier text given by the
+New Zealand National Climate Database (CliFlo) as a single text 
+column with the latitude and longitude, into two
+new latitude and longitude columns of type float.
 """
 
-def split_coord_column():
 
-    cliflo_table = arcpy.GetParameter(0)
-    point_class = arcpy.GetParameter(1)
-
+def split_coord_column(cliflo_table):
+    """
+    Adds a latitude and longitude field to the given table from the
+    coordinates given as text in the station identifier field.
+    :param cliflo_table: (ArcGis table) contains the single text column
+    with latitude and longitude and associated data such as rainfall
+    :return cliflo_table: (ArcGis table) the same table input as a parameter
+    but with new lat and lon fields of type float.
+    """
     arcpy.AddField_management(cliflo_table, "lat", "DOUBLE")
     arcpy.AddField_management(cliflo_table, "lon", "DOUBLE")
 
@@ -23,13 +27,7 @@ def split_coord_column():
         row[1] = lat
         row[2] = lon
         table_cursor.updateRow(row)
-
-        # create output
-        arcpy.XYTableToPoint_management(cliflo_table, point_class, "lon", "lat")
-
-
-
-
+    return cliflo_table
 
 def split_in_two(lat_lon_str):
     """
@@ -53,5 +51,3 @@ def split_in_two(lat_lon_str):
     lon = round(float(lat_lon_split[1]), 4)
     return lat, lon
 
-
-split_coord_column()
