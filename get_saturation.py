@@ -2,6 +2,8 @@ import arcpy
 import math
 
 def make_points(lon, lat, length, width):
+    """Creates an arcpy array of points which become the vertices for a new polygon"""
+
     points = arcpy.Array()
     points.append(arcpy.Point(lat, lon))
     points.append(arcpy.Point(lat+width, lon))
@@ -10,11 +12,13 @@ def make_points(lon, lat, length, width):
     points.append(points[0])
     return points
 
+# gets inputs from ArcGis tool
 table = arcpy.GetParameter(0)
 out_feature = arcpy.GetParameter(1)
+
+# For each row in the input table a polygon is made from the coordinates which contains the normalised IVT and time.
 table_cursor = arcpy.da.SearchCursor(table, ("latitude", "longitude", "time", "IVT_N", "IVT_E", "max_q"))
 add_polys = arcpy.da.InsertCursor(out_feature, ("time", "Shape@", "NORMIVT"))
-count = 0
 for lat_lon in table_cursor:
     lat = lat_lon[0]
     lon = lat_lon[1]
